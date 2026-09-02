@@ -1,5 +1,5 @@
 {
-  "name": "@thaiannguyen-05/opencode-rules",
+  "name": "opencode-andev-rules",
   "version": "1.0.0",
   "description": "On-demand rule injection plugin for opencode. Say 'follow the rule of andev' to load rules from GitHub.",
   "type": "module",
