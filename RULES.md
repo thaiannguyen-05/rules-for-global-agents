@@ -49,6 +49,14 @@
 - Test controllers and services separately
 - Use `supertest` for HTTP assertions in e2e
 
+## Types
+
+- Every module must have a `types.ts` file for module-specific types
+- Export all types from `types.ts` — import from there in other files
+- Use `type.ts` for: enums, interfaces, type aliases, return types
+- Do NOT put types in `dto/` — DTOs are for validation, types are for contracts
+- Import pattern: `import { UserRole } from './types'`
+
 ## File Structure
 
 ```
@@ -67,6 +75,7 @@ src/
 │       ├── [feature].module.ts
 │       ├── [feature].controller.ts
 │       ├── [feature].service.ts
+│       ├── types.ts              ← types, enums, interfaces
 │       ├── dto/
 │       └── entities/
 ```
