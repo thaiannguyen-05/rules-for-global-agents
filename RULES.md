@@ -80,6 +80,17 @@ export interface User { id: string; name: string; }
 ## File Structure
 
 ```
+andev-skill-agent/
+├── .git/
+├── package.json        # @thaiannguyen-05/opencode-rules
+├── plugin.js           # trigger detection + GitHub fetch
+├── README.md           # usage docs
+└── RULES.md            # this file — rules for agents
+```
+
+### NestJS Project Structure
+
+```
 src/
 ├── app.module.ts
 ├── main.ts
