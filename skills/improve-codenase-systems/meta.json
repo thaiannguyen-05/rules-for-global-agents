@@ -1,0 +1,8 @@
+{
+  "name": "improve-codenase-systems",
+  "version": "1.0.0",
+  "description": "Scan codebase for architecture issues and deepening opportunities",
+  "author": "thaiannguyen-05",
+  "tags": ["architecture", "review", "nestjs", "react"],
+  "files": ["SKILL.md", "HTML-REPORT.md", "agents/openai.yaml"]
+}

@@ -1,19 +1,21 @@
 # @thaiannguyen-05/opencode-rules
 
-Global coding rules for all AI agents. Plugin for [opencode](https://opencode.ai) to auto-inject rules when you say **"follow the rule of andev"**.
+Global coding rules for TypeScript & NestJS. Plugin for opencode.
 
-## Rules
+## Cài Plugin
 
-See `RULES.md` — covers TypeScript, NestJS, validation, error handling, testing, file structure, and code style.
+```bash
+opencode plugin @thaiannguyen-05/opencode-rules
+```
 
-## Install (opencode plugin)
+hoặc:
 
 ```bash
 cd ~/.config/opencode
 npm install @thaiannguyen-05/opencode-rules
 ```
 
-Add to `opencode.json`:
+Thêm vào `opencode.json`:
 
 ```json
 {
@@ -21,29 +23,34 @@ Add to `opencode.json`:
 }
 ```
 
-## Usage
+## Cài Skill
 
-In any prompt, include one of these trigger phrases:
-
-- `follow the rule of andev`
-- `follow andev rules`
-- `use andev rules`
-- `apply andev rules`
-- `andev rules`
-
-Example:
-
-```
-Build a user module with CRUD endpoints, follow the rule of andev
+```bash
+npx @thaiannguyen-05/skills-cli add improve-codenase-systems
 ```
 
-## How it works
+hoặc:
 
-1. Plugin scans your prompt for trigger phrases
-2. Fetches `RULES.md` from GitHub
-3. Injects rules into the system prompt for that response
-4. Caches the fetch — no re-fetch on every turn
+```bash
+cp -r skills/improve-codenase-systems ~/.agents/skills/
+```
 
-## Other Agents
+## Sử dụng
 
-Copy `RULES.md` into any agent's context (Cursor Rules, Windsurf Rules, Cline, etc.) — the rules are agent-agnostic.
+### Rules
+
+Nói "follow the rule of andev" trong prompt.
+
+### Skill
+
+Nói "scan codebase" hoặc "improve codebase" trong prompt.
+
+## Rules
+
+Xem `RULES.md` — covers TypeScript, NestJS, validation, error handling, database, security, API design, testing, and code style.
+
+## Skills
+
+| Skill | Description |
+|-------|-------------|
+| `improve-codenase-systems` | Scan codebase for architecture issues |

@@ -1,0 +1,15 @@
+{
+  "name": "andev-skills",
+  "version": "1.0.0",
+  "description": "AI agent skills by thaiannguyen-05",
+  "skills": [
+    {
+      "name": "improve-codenase-systems",
+      "description": "Scan codebase for architecture issues and deepening opportunities",
+      "version": "1.0.0",
+      "tags": ["architecture", "review", "nestjs", "react", "codebase"],
+      "path": "skills/improve-codenase-systems",
+      "files": ["SKILL.md", "HTML-REPORT.md", "agents/openai.yaml"]
+    }
+  ]
+}
