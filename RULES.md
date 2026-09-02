@@ -112,6 +112,20 @@ app.useGlobalFilters(new GlobalExceptionFilter(logger));
 - Keep migrations in `prisma/migrations` or `src/migrations`
 - Use repositories or Prisma client for data access
 - Never write raw SQL unless performance-critical (add comment why)
+- Use `select` when only a subset of fields is required — don't over-fetch
+- Avoid N+1 queries — use `include` or joins, not loops
+- Run independent queries in parallel — don't `await` sequentially
+- Use `findFirst` only when `findUnique` is possible
+- Paginate `findMany` — never return unbounded results
+- Use cursor pagination for large datasets, offset for small
+- Always `orderBy` deterministic fields for pagination
+- Handle Prisma errors — never leak raw Prisma errors to API responses
+- Use transactions for multi-step operations — no partial writes
+- Keep transaction scope small — no external calls inside transactions
+- Race conditions on read-modify-write — use transactions or locks
+- Add unique constraints for data that must be unique
+- Soft-delete: always filter `deletedAt` in queries
+- Avoid `include` for large relation collections — paginate or select
 
 ## Testing
 
@@ -121,6 +135,50 @@ app.useGlobalFilters(new GlobalExceptionFilter(logger));
 - Mock dependencies with `@nestjs/testing` `Test.createTestingModule()`
 - Test controllers and services separately
 - Use `supertest` for HTTP assertions in e2e
+
+## Async & Concurrency
+
+- Run independent async operations in parallel — don't `await` sequentially
+- Always handle promise rejections — no fire-and-forget without error handling
+- Add timeout for external service calls
+- Use idempotency keys for retryable operations
+- Retry with limits and exponential backoff
+- Never retry non-idempotent operations unsafely
+- Race conditions: use transactions or locks for read-modify-write
+
+## Security
+
+- Never hardcode secrets or credentials — use `ConfigModule`
+- Never expose sensitive data in API responses
+- Validate and sanitize all user input
+- Prevent IDOR — check resource ownership
+- Use parameterized queries — no raw SQL concatenation
+- Validate file uploads: size, type, content
+- Never trust client-provided file metadata
+- Secure CORS configuration — no wildcard in production
+- Rate limit sensitive endpoints (login, register, password reset)
+- Never log sensitive data (passwords, tokens, PII)
+- Use guards for auth — no manual auth checks in controllers
+
+## API Design
+
+- Consistent REST naming: plural nouns, HTTP verbs for actions
+- Consistent error response format: `{ statusCode, message, errorCode }`
+- Paginate all list endpoints — no unbounded responses
+- Filter and limit query parameters
+- Version API when making breaking changes
+- Use appropriate HTTP status codes (201 for create, 204 for delete)
+- Never expose internal implementation details in responses
+
+## Observability
+
+- Use structured logging (nestjs-pino)
+- Never log sensitive data
+- Propagate request/correlation IDs
+- Add health check endpoints for critical dependencies
+- Handle graceful shutdown — clean up connections
+- Clean up timers, listeners, subscriptions
+- Handle background job failures
 
 ## File Structure
 
