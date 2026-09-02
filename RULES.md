@@ -58,16 +58,22 @@
 - Do NOT put types in `dto/` — DTOs are for validation, types are for contracts
 - Import pattern: `import { UserRole } from './types'`
 - Put constants in `types.ts`: event names, URLs, status codes, config values
-- Use `as const` for constants — no hardcoded strings in business logic
-- Example: `export const EVENT_CREATED = 'user.created' as const;`
+- Use `enum` for constants — no hardcoded strings in business logic
+- Example: `export enum EventName { CREATED = 'user.created' }`
 
 ```typescript
 // types.ts
-export const EVENT_CREATED = 'user.created' as const;
-export const API_BASE_URL = '/api/v1' as const;
-export const MAX_FILE_SIZE = 10 * 1024 * 1024 as const;
+export enum EventName {
+  CREATED = 'user.created',
+  UPDATED = 'user.updated',
+  DELETED = 'user.deleted',
+}
 
-export type EventName = typeof EVENT_CREATED;
+export enum ApiUrl {
+  BASE = '/api/v1',
+  USERS = '/api/v1/users',
+}
+
 export interface User { id: string; name: string; }
 ```
 
