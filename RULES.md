@@ -116,35 +116,88 @@ export class ResourceNotFoundException extends AppException {
     super(`${resourceType} with identifier ${identifier} not found`, HttpStatus.NOT_FOUND, 'RESOURCE_NOT_FOUND');
   }
 }
-```
 
-- Extend `AppException` for domain-specific errors
-- Each exception gets: `message`, `statusCode`, `errorCode`, optional `details`
-- `errorCode` = uppercase snake_case (e.g., `RESOURCE_NOT_FOUND`, `FILE_VALIDATION_FAILED`)
+export class FileValidationException extends AppException {
+  constructor(message: string) {
+    super(message, HttpStatus.BAD_REQUEST, 'FILE_VALIDATION_FAILED');
+  }
+}
+
+export class FileNotFoundException extends AppException {
+  constructor(fileName: string) {
+    super(`File not found: ${fileName}`, HttpStatus.NOT_FOUND, 'FILE_NOT_FOUND');
+  }
+}
+
+export class StorageUnavailableException extends AppException {
+  constructor(message: string, details?: unknown) {
+    super(message, HttpStatus.BAD_GATEWAY, 'STORAGE_UNAVAILABLE', details);
+  }
+}
+```
 
 ### global.exception.ts — Global Exception Filter
 
 ```typescript
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
+import { Logger } from 'nestjs-pino';
+import { Request, Response } from 'express';
+
+interface ExceptionResponseBody {
+  message?: string | string[];
+  errorCode?: string;
+  details?: unknown;
+}
+
+function isExceptionResponseBody(value: unknown): value is ExceptionResponseBody {
+  return typeof value === 'object' && value !== null;
+}
+
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
+  constructor(private readonly logger?: Logger) {}
+
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    // Extract status, message, errorCode from HttpException
-    // Log unhandled exceptions
-    // Return: { statusCode, timestamp, path, message, errorCode?, details? }
+    let status = HttpStatus.INTERNAL_SERVER_ERROR;
+    let message: string | string[] = 'Internal server error';
+    let errorCode: string | undefined;
+    let details: unknown;
+
+    if (exception instanceof HttpException) {
+      status = exception.getStatus();
+      const body: unknown = exception.getResponse();
+      if (typeof body === 'string') {
+        message = body;
+      } else if (isExceptionResponseBody(body)) {
+        message = body.message ?? 'Unknown error';
+        errorCode = body.errorCode;
+        details = body.details;
+      }
+    } else {
+      this.logger?.error(exception, 'Unhandled exception');
+    }
+
+    response.status(status).json({
+      statusCode: status,
+      timestamp: new Date().toISOString(),
+      path: request.url,
+      message,
+      ...(errorCode && { errorCode }),
+      ...(details !== undefined && { details }),
+    });
   }
 }
 ```
 
-- Register in `main.ts`: `app.useGlobalFilters(new GlobalExceptionFilter(logger))`
-- Always return consistent JSON shape: `{ statusCode, timestamp, path, message, errorCode?, details? }`
-
 ### storage-error.helper.ts — Helper Functions
 
 ```typescript
+import { FileNotFoundException, StorageUnavailableException } from './app.exception';
+
 export function throwStorageError(error: unknown, context: string): never {
   const message = error instanceof Error ? error.message : context;
   throw new StorageUnavailableException(context, message);
@@ -155,6 +208,18 @@ export function isNotFoundError(error: unknown): boolean {
 }
 ```
 
+### Register in main.ts
+
+```typescript
+app.useGlobalFilters(new GlobalExceptionFilter(logger));
+```
+
+### Rules
+
+- Extend `AppException` for domain-specific errors
+- Each exception gets: `message`, `statusCode`, `errorCode`, optional `details`
+- `errorCode` = uppercase snake_case (e.g., `RESOURCE_NOT_FOUND`, `FILE_VALIDATION_FAILED`)
+- Always return consistent JSON: `{ statusCode, timestamp, path, message, errorCode?, details? }`
+- Log unhandled (non-HttpException) errors with logger
 - Use helper functions for repetitive error scenarios
-- `throwStorageError` wraps storage errors with context
-- `isNotFoundError` checks error codes without throwing
+- Test exceptions with `exception.getResponse()` to verify shape
