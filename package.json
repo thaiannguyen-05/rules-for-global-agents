@@ -1,0 +1,25 @@
+{
+  "name": "@thaiannguyen-05/opencode-rules",
+  "version": "1.0.0",
+  "description": "On-demand rule injection plugin for opencode. Say 'follow the rule of andev' to load rules from GitHub.",
+  "type": "module",
+  "main": "plugin.js",
+  "exports": {
+    ".": "./plugin.js"
+  },
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "rules",
+    "nestjs",
+    "typescript"
+  ],
+  "author": "thaiannguyen-05",
+  "license": "MIT",
+  "peerDependencies": {
+    "@opencode-ai/plugin": ">=1.15.0"
+  },
+  "devDependencies": {
+    "@opencode-ai/plugin": "1.17.11"
+  }
+}
