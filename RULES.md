@@ -29,10 +29,27 @@
 
 ## Validation
 
+- Handle ALL validation before controller and service
+- Use global `ValidationPipe` in `main.ts` — reject invalid requests early
 - Use `class-validator` decorators on DTOs
 - Use `class-transformer` with `ValidationPipe` globally
 - Validate nested objects with `@ValidateNested()`
 - Use `@IsString()`, `@IsNumber()`, `@IsEmail()`, `@IsOptional()` etc.
+- Controllers and services receive only valid data — no validation logic inside
+- Use `WhitelistStrategy` + `ForbidNonWhitelisted` to reject unknown fields
+- Use `TransformPipe` to auto-transform payloads to DTO instances
+
+### Setup in main.ts
+
+```typescript
+app.useGlobalPipes(
+  new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true,
+  }),
+);
+```
 
 ## Database
 
