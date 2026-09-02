@@ -23,6 +23,7 @@
 - Use `@InjectRepository()` for TypeORM/Prisma repositories
 - Use guards for auth (`@UseGuards`), interceptors for logging/transformation
 - Handle errors with exceptions (`NotFoundException`, `BadRequestException`, etc.)
+- Use custom exception classes extending `AppException` (see Error Handling below)
 - Use `ConfigModule` for environment variables — no `process.env` in code
 - Use `@nestjs/schedule` for cron jobs — no `setInterval`
 
@@ -89,3 +90,71 @@ src/
 - Use `path aliases` (`@/`) for clean imports
 - Prefer `async/await` over `.then()` chains
 - Use `enum` sparingly — prefer `as const` objects for lookup tables
+
+## Error Handling
+
+Create `src/error/` directory with:
+
+### app.exception.ts — Base + Specific Exceptions
+
+```typescript
+import { HttpException, HttpStatus } from '@nestjs/common';
+
+export class AppException extends HttpException {
+  constructor(
+    message: string,
+    statusCode: HttpStatus,
+    public readonly errorCode?: string,
+    public readonly details?: unknown,
+  ) {
+    super({ message, errorCode, details, timestamp: new Date().toISOString() }, statusCode);
+  }
+}
+
+export class ResourceNotFoundException extends AppException {
+  constructor(resourceType: string, identifier: string | number) {
+    super(`${resourceType} with identifier ${identifier} not found`, HttpStatus.NOT_FOUND, 'RESOURCE_NOT_FOUND');
+  }
+}
+```
+
+- Extend `AppException` for domain-specific errors
+- Each exception gets: `message`, `statusCode`, `errorCode`, optional `details`
+- `errorCode` = uppercase snake_case (e.g., `RESOURCE_NOT_FOUND`, `FILE_VALIDATION_FAILED`)
+
+### global.exception.ts — Global Exception Filter
+
+```typescript
+@Catch()
+export class GlobalExceptionFilter implements ExceptionFilter {
+  catch(exception: unknown, host: ArgumentsHost): void {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
+
+    // Extract status, message, errorCode from HttpException
+    // Log unhandled exceptions
+    // Return: { statusCode, timestamp, path, message, errorCode?, details? }
+  }
+}
+```
+
+- Register in `main.ts`: `app.useGlobalFilters(new GlobalExceptionFilter(logger))`
+- Always return consistent JSON shape: `{ statusCode, timestamp, path, message, errorCode?, details? }`
+
+### storage-error.helper.ts — Helper Functions
+
+```typescript
+export function throwStorageError(error: unknown, context: string): never {
+  const message = error instanceof Error ? error.message : context;
+  throw new StorageUnavailableException(context, message);
+}
+
+export function isNotFoundError(error: unknown): boolean {
+  return error instanceof Error && 'code' in error && (error.code === 'NotFound' || error.code === 'NoSuchKey');
+}
+```
+
+- Use helper functions for repetitive error scenarios
+- `throwStorageError` wraps storage errors with context
+- `isNotFoundError` checks error codes without throwing
