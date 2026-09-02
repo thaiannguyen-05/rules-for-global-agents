@@ -91,11 +91,25 @@ src/
 │   ├── pipes/
 │   └── decorators/
 ├── modules/
-│   └── [feature]/
-│       ├── [feature].module.ts
-│       ├── [feature].controller.ts
-│       ├── [feature].service.ts
-│       ├── types.ts              ← types, enums, interfaces
+│   ├── users/
+│   │   ├── users.module.ts
+│   │   ├── users.controller.ts
+│   │   ├── users.service.ts
+│   │   ├── types.ts
+│   │   ├── dto/
+│   │   └── entities/
+│   ├── auth/
+│   │   ├── auth.module.ts
+│   │   ├── auth.controller.ts
+│   │   ├── auth.service.ts
+│   │   ├── types.ts
+│   │   ├── dto/
+│   │   └── entities/
+│   └── orders/
+│       ├── orders.module.ts
+│       ├── orders.controller.ts
+│       ├── orders.service.ts
+│       ├── types.ts
 │       ├── dto/
 │       └── entities/
 ```
