@@ -193,10 +193,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 }
 ```
 
-### storage-error.helper.ts — Helper Functions
+### storage-error.helper.ts — Example Helper Functions
 
 ```typescript
-import { FileNotFoundException, StorageUnavailableException } from './app.exception';
+import { StorageUnavailableException } from './app.exception';
 
 export function throwStorageError(error: unknown, context: string): never {
   const message = error instanceof Error ? error.message : context;
@@ -207,6 +207,10 @@ export function isNotFoundError(error: unknown): boolean {
   return error instanceof Error && 'code' in error && (error.code === 'NotFound' || error.code === 'NoSuchKey');
 }
 ```
+
+- Create helper files for domain-specific error scenarios (e.g., `storage-error.helper.ts`, `auth-error.helper.ts`)
+- Use helper functions to wrap and throw exceptions with context
+- Use predicate functions to check error types without throwing
 
 ### Register in main.ts
 
