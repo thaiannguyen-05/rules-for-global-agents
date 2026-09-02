@@ -129,11 +129,22 @@ src/
 
 - Use Prettier for formatting
 - Use ESLint with `@typescript-eslint` rules
+- Max 300 lines per file — split if超过
 - One export per file — no barrel exports in middle of file
 - Sort imports: node builtins → external → internal → relative
 - Use `path aliases` (`@/`) for clean imports
 - Prefer `async/await` over `.then()` chains
 - Use `enum` sparingly — prefer `as const` objects for lookup tables
+
+### ESLint Config
+
+```json
+{
+  "rules": {
+    "max-lines": ["error", { "max": 300, "skipBlankLines": true, "skipComments": true }]
+  }
+}
+```
 
 ## Error Handling
 
