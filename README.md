@@ -1,8 +1,12 @@
 # @thaiannguyen-05/opencode-rules
 
-On-demand rule injection plugin for [opencode](https://opencode.ai). Say **"follow the rule of andev"** in your prompt to load rules from your GitHub repo.
+Global coding rules for all AI agents. Plugin for [opencode](https://opencode.ai) to auto-inject rules when you say **"follow the rule of andev"**.
 
-## Install
+## Rules
+
+See `RULES.md` — covers TypeScript, NestJS, validation, error handling, testing, file structure, and code style.
+
+## Install (opencode plugin)
 
 ```bash
 cd ~/.config/opencode
@@ -36,19 +40,10 @@ Build a user module with CRUD endpoints, follow the rule of andev
 ## How it works
 
 1. Plugin scans your prompt for trigger phrases
-2. Fetches `RULES.md` from `https://raw.githubusercontent.com/thaiannguyen-05/rules-for-global-agents/main/RULES.md`
+2. Fetches `RULES.md` from GitHub
 3. Injects rules into the system prompt for that response
 4. Caches the fetch — no re-fetch on every turn
 
-## Configuration
+## Other Agents
 
-The GitHub repo URL is hardcoded. To change it, edit `plugin.js`:
-
-```js
-const RULES_URL = 'https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/RULES.md';
-```
-
-## Requirements
-
-- opencode >= 1.15.0
-- A `RULES.md` file in your GitHub repo
+Copy `RULES.md` into any agent's context (Cursor Rules, Windsurf Rules, Cline, etc.) — the rules are agent-agnostic.
