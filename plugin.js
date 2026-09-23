@@ -1,4 +1,4 @@
-// @thaiannguyen-05/opencode-rules
+// opencode-andev-rules
 //
 // On-demand rule injection plugin for opencode.
 // When user says "follow the rule of andev" (or similar), fetches RULES.md

@@ -185,7 +185,7 @@ app.useGlobalFilters(new GlobalExceptionFilter(logger));
 ```
 andev-skill-agent/
 ├── .git/
-├── package.json        # @thaiannguyen-05/opencode-rules
+├── package.json        # opencode-andev-rules
 ├── plugin.js           # trigger detection + GitHub fetch
 ├── README.md           # usage docs
 └── RULES.md            # this file — rules for agents
@@ -236,7 +236,7 @@ src/
 
 - Use Prettier for formatting
 - Use ESLint with `@typescript-eslint` rules
-- Max 300 lines per file — split if超过
+- Max 300 lines per file — split if over
 - One export per file — no barrel exports in middle of file
 - Sort imports: node builtins → external → internal → relative
 - Use `path aliases` (`@/`) for clean imports
