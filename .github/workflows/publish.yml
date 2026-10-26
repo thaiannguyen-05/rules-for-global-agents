@@ -52,13 +52,21 @@ jobs:
       - name: Publish
         # Ưu tiên npm Trusted Publishing (OIDC, không cần token).
         # Nếu chưa cấu hình trusted publisher trên npmjs.com thì fallback
-        # sang NPM_TOKEN (repo secret). Secrets rỗng => npm tự dùng OIDC.
-        # Lưu ý: npm trả 404 trên PUT khi auth thiếu/sai (thay vì 403 để
-        # tránh lộ package tồn tại). Nếu thấy E404 ở step này, 99% là
-        # chưa setup NPM_TOKEN hoặc Trusted Publisher.
+        # sang NPM_TOKEN (repo secret).
+        # Lưu ý: setup-node tạo .npmrc chứa dòng _authToken rỗng khi secret
+        # trống -> phải xóa dòng đó thì npm mới chịu dùng OIDC, nếu không
+        # sẽ fail ENEEDAUTH. npm cũng trả 404 trên PUT khi OIDC chưa được
+        # cấu hình đúng (sai repo/workflow/environment).
         run: |
-          if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
-            echo "::notice::NPM_TOKEN trống, sẽ dùng npm Trusted Publishing (OIDC). Nếu chưa cấu hình trusted publisher trên npmjs.com thì step này sẽ 404."
+          if [ -n "$NODE_AUTH_TOKEN" ]; then
+            echo "Dùng NPM_TOKEN để publish."
+          else
+            echo "::notice::NPM_TOKEN trống, dùng npm Trusted Publishing (OIDC)."
+            NPMRC="${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
+            if [ -f "$NPMRC" ]; then
+              sed -i '/_authToken/d' "$NPMRC" || true
+              echo "Đã xóa _authToken trống khỏi $NPMRC để npm dùng OIDC."
+            fi
           fi
           npm publish --provenance --access public
         env:
