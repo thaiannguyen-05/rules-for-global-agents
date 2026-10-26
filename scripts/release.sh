@@ -11,13 +11,20 @@ set -euo pipefail
 #   bash scripts/release.sh 1.2.3   # version cụ thể
 #
 # Thêm --no-push để chỉ bump + publish local mà chưa push tag.
+# Thêm --no-publish để chỉ bump version + commit/tag local mà chưa publish
+# (dùng trong CI: bump trước, publish ở step riêng để log rõ + tránh publish 2 lần).
 
-BUMP="${1:-patch}"
+BUMP="patch"
 PUSH=true
+PUBLISH=true
 for arg in "$@"; do
-  [ "$arg" = "--no-push" ] && PUSH=false
+  case "$arg" in
+    --no-push) PUSH=false ;;
+    --no-publish) PUBLISH=false ;;
+    --*) echo "::error::Flag lạ: $arg (chỉ hỗ trợ --no-push, --no-publish)" >&2; exit 2 ;;
+    *) BUMP="$arg" ;;
+  esac
 done
-case "$BUMP" in --push|--no-push) BUMP="patch";; esac
 
 if [ -n "$(git status --porcelain)" ]; then
   echo "::error::Working tree bẩn. Commit hoặc stash hết rồi chạy lại."
@@ -57,8 +64,12 @@ echo "  synced skills/registry.json version -> $NEW_VERSION"
 echo "==> Kiểm tra version chưa tồn tại trên npm"
 bash scripts/check-version.sh
 
-echo "==> Publish $NEW_VERSION lên npm (dùng npm auth local)"
-npm publish --provenance --access public
+if [ "$PUBLISH" = true ]; then
+  echo "==> Publish $NEW_VERSION lên npm (dùng npm auth local)"
+  npm publish --provenance --access public
+else
+  echo "==> Bỏ qua publish (--no-publish). Version mới $NEW_VERSION mới bump local, chưa publish."
+fi
 
 git add package.json skills/registry.json
 [ -f package-lock.json ] && git add package-lock.json
@@ -68,8 +79,16 @@ echo "  committed + tagged v$NEW_VERSION"
 
 if [ "$PUSH" = true ]; then
   git push --follow-tags
-  echo "Xong: đã publish $NEW_VERSION và push tag."
+  if [ "$PUBLISH" = true ]; then
+    echo "Xong: đã publish $NEW_VERSION và push tag."
+  else
+    echo "Xong: đã bump $NEW_VERSION (chưa publish) và push tag."
+  fi
 else
-  echo "Publish xong local (chưa push). Khi sẵn sàng:"
+  if [ "$PUBLISH" = true ]; then
+    echo "Publish xong local (chưa push). Khi sẵn sàng:"
+  else
+    echo "Bump xong local (chưa publish, chưa push). Khi sẵn sàng:"
+  fi
   echo "  git push --follow-tags"
 fi

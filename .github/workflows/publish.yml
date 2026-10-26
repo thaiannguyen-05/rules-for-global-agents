@@ -45,15 +45,22 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Bump version (tự động, không cần sửa tay)
-        # npm version patch|minor|major, sync skills/registry.json,
-        # kiểm tra version chưa có trên npm, commit + tag local (chưa push).
-        run: bash scripts/release.sh "${{ inputs.bump }}" --no-push
+        # Chỉ bump + commit/tag local, CHƯA publish.
+        # Publish nằm ở step riêng bên dưới để log rõ + tránh publish 2 lần.
+        run: bash scripts/release.sh "${{ inputs.bump }}" --no-push --no-publish
 
       - name: Publish
         # Ưu tiên npm Trusted Publishing (OIDC, không cần token).
         # Nếu chưa cấu hình trusted publisher trên npmjs.com thì fallback
         # sang NPM_TOKEN (repo secret). Secrets rỗng => npm tự dùng OIDC.
-        run: npm publish --provenance --access public
+        # Lưu ý: npm trả 404 trên PUT khi auth thiếu/sai (thay vì 403 để
+        # tránh lộ package tồn tại). Nếu thấy E404 ở step này, 99% là
+        # chưa setup NPM_TOKEN hoặc Trusted Publisher.
+        run: |
+          if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
+            echo "::notice::NPM_TOKEN trống, sẽ dùng npm Trusted Publishing (OIDC). Nếu chưa cấu hình trusted publisher trên npmjs.com thì step này sẽ 404."
+          fi
+          npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
