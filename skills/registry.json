@@ -33,7 +33,8 @@
       "path": "skills/backend/nestJS",
       "files": [
         "SKILL.md",
-        "references/nestjs-module.md"
+        "references/nestjs-module.md",
+        "references/nestjs-testing.md"
       ]
     },
     {
