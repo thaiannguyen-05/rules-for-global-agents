@@ -64,30 +64,3 @@ scripts/
 3. Chạy `npm run validate` trước khi push.
 4. **Không sửa version bằng tay** — version do workflow publish tự tăng (xem dưới).
 
-## Release lên npm
-
-> npm **từ chối publish đè version cũ** — version được **tự tăng mỗi lần publish**, không ai cần sửa `package.json`.
-
-**Cách chính — bấm nút (khuyên dùng):**
-
-1. Vào tab **Actions** → workflow **Publish to npm** → **Run workflow**
-2. Chọn loại tăng version: `patch` (fix skill, sửa doc) / `minor` (thêm skill) / `major` (breaking)
-3. Workflow tự: validate → bump version → sync `skills/registry.json` → kiểm tra version chưa có trên npm → publish → push commit + tag `vX.Y.Z` về main
-
-**Cách phụ — chạy local** (yêu cầu đã `npm login`):
-
-```bash
-bash scripts/release.sh patch   # hoặc: minor | major | 1.2.3
-```
-
-Kiểm tra: https://www.npmjs.com/package/opencode-andev-rules
-
-### Setup npm auth 1 lần duy nhất (chọn 1 trong 2)
-
-**Cách A — NPM_TOKEN (nhanh nhất):**
-1. npmjs.com → Access Tokens → Generate New Token → **Automation**
-2. GitHub repo → Settings → Secrets → Actions → New secret `NPM_TOKEN` = token vừa tạo
-
-**Cách B — Trusted Publishing (không cần token):**
-1. npmjs.com → package `opencode-andev-rules` → Settings → Trusted Publisher → GitHub Actions → nhập `thaiannguyen-05/rules-for-global-agents` + workflow `publish.yml`
-2. Xóa secret `NPM_TOKEN` (workflow tự fallback sang OIDC, Node 22 đã đủ npm ≥ 11.5.1)
