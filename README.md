@@ -1,14 +1,12 @@
-# @thaiannguyen-05/opencode-rules
+# opencode-andev-rules
 
 Global coding rules for TypeScript & NestJS + AI agent skills.
 
 ## Cài Skill
 
-```bash
-npx @thaiannguyen-05/skills-cli add improve-codenase-systems
-```
+> `@thaiannguyen-05/skills-cli` chưa được publish lên npm (404), nên không dùng `npx` được.
 
-hoặc:
+Dùng cách copy trực tiếp:
 
 ```bash
 cp -r skills/improve-codenase-systems ~/.agents/skills/
