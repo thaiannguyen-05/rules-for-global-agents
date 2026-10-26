@@ -39,6 +39,13 @@ jobs:
           node-version: 22
           registry-url: "https://registry.npmjs.org"
 
+      - name: Upgrade npm (OIDC cần npm >= 11.5.1)
+        # Node 22 mặc định kèm npm 10.x -> không hiểu Trusted Publishing,
+        # publish sẽ fail ENEEDAUTH dù đã xóa _authToken.
+        run: |
+          npm install -g npm@11
+          npm --version
+
       - name: Configure git identity
         run: |
           git config user.name "github-actions[bot]"
