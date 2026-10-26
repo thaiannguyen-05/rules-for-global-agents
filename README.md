@@ -53,7 +53,7 @@ scripts/
 ├── check-version.sh # kiểm tra version chưa tồn tại trên npm
 └── release.sh       # bump version an toàn (xem dưới)
 .github/workflows/
-├── ci.yml           # validate trên mỗi push/PR
+├── ci.yml           # 3 jobs async song song (frontmatter/registry/pack) trên mỗi push/PR
 └── publish.yml      # nút Run workflow: tự bump version + publish lên npm
 ```
 

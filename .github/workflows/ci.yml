@@ -9,9 +9,25 @@ on:
 permissions:
   contents: read
 
+# Push dồn dập thì hủy run cũ, khỏi xếp hàng sync.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# 3 jobs KHÔNG có `needs:` => GitHub Actions chạy song song (async).
+# Job nào fail thì job đó đỏ, các job còn lại vẫn chạy tiếp.
 jobs:
-  validate:
-    name: Validate skills
+  frontmatter:
+    name: Validate frontmatter
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check SKILL.md name + description
+        run: bash scripts/validate.sh --only-frontmatter
+
+  registry:
+    name: Validate registry
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,5 +36,18 @@ jobs:
         with:
           node-version: 22
 
-      - name: Validate skills + pack dry-run
-        run: bash scripts/validate.sh
+      - name: Check registry.json entries
+        run: bash scripts/validate.sh --only-registry
+
+  pack:
+    name: Pack dry-run
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: npm pack --dry-run
+        run: bash scripts/validate.sh --only-pack
