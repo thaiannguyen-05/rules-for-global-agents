@@ -2,7 +2,7 @@ name: Publish to npm
 
 # Publish hoàn toàn tự động, KHÔNG cần sửa package.json bằng tay.
 # Vào Actions tab -> "Publish to npm" -> Run workflow -> chọn patch/minor/major.
-# Workflow tự: validate -> bump version -> sync registry -> publish -> push tag.
+# Workflow tự: validate -> bump version -> mở PR release/* -> squash-merge vào main -> publish -> push tag.
 on:
   workflow_dispatch:
     inputs:
@@ -17,7 +17,8 @@ on:
           - major
 
 permissions:
-  contents: write # cần để push commit + tag version về main
+  contents: write # cần để push nhánh release/* + push tag version
+  pull-requests: write # cần để tạo + squash-merge PR bump version vào main
   id-token: write # cần cho --provenance (Sigstore) + npm trusted publishing
 
 concurrency:
@@ -56,8 +57,24 @@ jobs:
         # Publish nằm ở step riêng bên dưới để log rõ + tránh publish 2 lần.
         run: bash scripts/release.sh "${{ inputs.bump }}" --no-push --no-publish
 
+      - name: Mở PR bump version và squash-merge vào main
+        # Ruleset chặn push thẳng vào main (pull_request + squash only),
+        # nên đẩy commit bump lên nhánh release/* rồi merge qua PR.
+        # Đẩy nhánh release/* được phép vì ruleset chỉ áp dụng cho ~DEFAULT_BRANCH.
+        run: |
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          git tag -d "v$NEW_VERSION" || true
+          BRANCH="release/v$NEW_VERSION"
+          git checkout -b "$BRANCH"
+          git push -u origin "$BRANCH"
+          gh pr create --base main --head "$BRANCH" --title "chore(release): v$NEW_VERSION" --body "Auto bump version to $NEW_VERSION."
+          gh pr merge --squash --delete-branch "$BRANCH"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Publish
-        # Ưu tiên npm Trusted Publishing (OIDC, không cần token).
+        # Chạy sau khi PR đã merge: checkout lại main mới rồi mới publish,
+        # để repo luôn đi trước npm. Tag tạo lại sau khi publish xong.
         # Nếu chưa cấu hình trusted publisher trên npmjs.com thì fallback
         # sang NPM_TOKEN (repo secret).
         # Lưu ý: setup-node tạo .npmrc chứa dòng _authToken rỗng khi secret
@@ -65,6 +82,9 @@ jobs:
         # sẽ fail ENEEDAUTH. npm cũng trả 404 trên PUT khi OIDC chưa được
         # cấu hình đúng (sai repo/workflow/environment).
         run: |
+          git checkout main
+          git fetch origin main
+          git reset --hard origin/main
           if [ -n "$NODE_AUTH_TOKEN" ]; then
             echo "Dùng NPM_TOKEN để publish."
           else
@@ -79,6 +99,14 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Push commit + tag về main
-        # Publish xong mới push: nếu publish fail thì repo không dính tag rác.
-        run: git push --follow-tags
+      - name: Đẩy tag version (tag không bị ruleset chặn)
+        # Tag refs/tags/* không thuộc phạm vi branch ruleset nên push trực tiếp được.
+        # Publish xong mới đẩy tag: nếu publish fail thì main đã có commit
+        # nhưng chưa có tag rác, chạy lại workflow sẽ bump tiếp.
+        run: |
+          git checkout main
+          git fetch origin main
+          git reset --hard origin/main
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          git tag "v$NEW_VERSION"
+          git push origin "v$NEW_VERSION"
