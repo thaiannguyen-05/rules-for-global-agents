@@ -1,25 +1,16 @@
 {
   "name": "opencode-andev-rules",
   "version": "1.0.0",
-  "description": "On-demand rule injection plugin for opencode. Say 'follow the rule of andev' to load rules from GitHub.",
-  "type": "module",
-  "main": "plugin.js",
-  "exports": {
-    ".": "./plugin.js"
-  },
+  "description": "Global coding rules for TypeScript & NestJS + AI agent skills.",
+  "files": [
+    "skills/"
+  ],
   "keywords": [
-    "opencode",
-    "opencode-plugin",
     "rules",
     "nestjs",
-    "typescript"
+    "typescript",
+    "skills"
   ],
   "author": "thaiannguyen-05",
-  "license": "MIT",
-  "peerDependencies": {
-    "@opencode-ai/plugin": ">=1.15.0"
-  },
-  "devDependencies": {
-    "@opencode-ai/plugin": "1.17.11"
-  }
+  "license": "MIT"
 }
