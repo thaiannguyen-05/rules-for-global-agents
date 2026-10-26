@@ -2,9 +2,29 @@
   "name": "opencode-andev-rules",
   "version": "1.0.0",
   "description": "Global coding rules for TypeScript & NestJS + AI agent skills.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thaiannguyen-05/rules-for-global-agents.git"
+  },
+  "bugs": {
+    "url": "https://github.com/thaiannguyen-05/rules-for-global-agents/issues"
+  },
+  "homepage": "https://github.com/thaiannguyen-05/rules-for-global-agents#readme",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "files": [
-    "skills/"
+    "skills/",
+    "README.md",
+    "LICENSE"
   ],
+  "scripts": {
+    "validate": "bash scripts/validate.sh",
+    "check-version": "bash scripts/check-version.sh",
+    "release": "bash scripts/release.sh",
+    "pack": "npm pack --dry-run"
+  },
   "keywords": [
     "rules",
     "nestjs",
@@ -12,5 +32,8 @@
     "skills"
   ],
   "author": "thaiannguyen-05",
-  "license": "MIT"
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
 }

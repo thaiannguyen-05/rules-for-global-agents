@@ -1,0 +1,62 @@
+name: Publish to npm
+
+# Publish hoàn toàn tự động, KHÔNG cần sửa package.json bằng tay.
+# Vào Actions tab -> "Publish to npm" -> Run workflow -> chọn patch/minor/major.
+# Workflow tự: validate -> bump version -> sync registry -> publish -> push tag.
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Loại tăng version (patch: fix, minor: thêm skill, major: breaking)"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write # cần để push commit + tag version về main
+  id-token: write # cần cho --provenance (Sigstore) + npm trusted publishing
+
+concurrency:
+  group: publish-npm
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Bump + publish to npm
+    runs-on: ubuntu-latest
+    environment: npm
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump version (tự động, không cần sửa tay)
+        # npm version patch|minor|major, sync skills/registry.json,
+        # kiểm tra version chưa có trên npm, commit + tag local (chưa push).
+        run: bash scripts/release.sh "${{ inputs.bump }}" --no-push
+
+      - name: Publish
+        # Ưu tiên npm Trusted Publishing (OIDC, không cần token).
+        # Nếu chưa cấu hình trusted publisher trên npmjs.com thì fallback
+        # sang NPM_TOKEN (repo secret). Secrets rỗng => npm tự dùng OIDC.
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Push commit + tag về main
+        # Publish xong mới push: nếu publish fail thì repo không dính tag rác.
+        run: git push --follow-tags
