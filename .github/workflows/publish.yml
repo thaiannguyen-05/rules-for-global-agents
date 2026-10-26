@@ -1,0 +1,56 @@
+name: Publish to npm
+
+# Publish khi: push tag v*.*.*  (vd: v1.0.1)
+#           hoặc tạo GitHub Release (releases -> published).
+# Tag phải khớp version trong package.json (không tính prefix "v").
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write # cần cho --provenance (Sigstore) + npm trusted publishing
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    environment: npm
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Check tag matches package.json version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          echo "package.json: $PKG_VERSION | tag: $TAG_VERSION"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Tag v$TAG_VERSION != package.json $PKG_VERSION. Hãy bump version cho khớp rồi tag lại."
+            exit 1
+          fi
+
+      - name: Validate skills + pack dry-run
+        run: bash scripts/validate.sh
+
+      - name: Check version not already on npm
+        # npm từ chối publish đè version cũ (403). Fail sớm với message rõ ràng
+        # thay vì để `npm publish` chết khó hiểu. Lưu ý: version hiện tại đã
+        # publish rồi thì bắt buộc bump version trước (bash scripts/release.sh).
+        run: bash scripts/check-version.sh
+
+      - name: Publish
+        # Ưu tiên npm Trusted Publishing (OIDC, không cần token).
+        # Nếu chưa cấu hình trusted publisher trên npmjs.com thì fallback
+        # sang NPM_TOKEN (repo secret). Secrets rỗng => npm tự dùng OIDC.
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
