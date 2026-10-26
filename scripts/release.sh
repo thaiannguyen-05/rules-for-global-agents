@@ -1,22 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Bump version an toàn: validate skills -> bump package.json (+ sync
-# registry.json) -> kiểm tra version chưa tồn tại trên npm -> push tag.
+# Publish từ máy local, KHÔNG cần sửa package.json bằng tay.
+# (Cách chính vẫn là nút Actions -> "Publish to npm" -> Run workflow,
+#  script này chỉ dành cho ai muốn chạy local — yêu cầu đã `npm login`.)
 #
-#   bash scripts/release.sh patch [--push]   # 1.0.0 -> 1.0.1
-#   bash scripts/release.sh minor [--push]   # 1.0.0 -> 1.1.0
-#   bash scripts/release.sh major [--push]   # 1.0.0 -> 2.0.0
-#   bash scripts/release.sh 1.2.3 [--push]   # version cụ thể
+#   bash scripts/release.sh patch   # 1.0.0 -> 1.0.1 (fix skill, sửa doc)
+#   bash scripts/release.sh minor   # 1.0.0 -> 1.1.0 (thêm skill mới)
+#   bash scripts/release.sh major   # 1.0.0 -> 2.0.0 (đổi cấu trúc, breaking)
+#   bash scripts/release.sh 1.2.3   # version cụ thể
 #
-# Mặc định CÓ push (commit + tag) lên origin để kích hoạt workflow publish.
-# Dùng --no-push để chỉ bump local.
+# Thêm --no-push để chỉ bump + publish local mà chưa push tag.
 
 BUMP="${1:-patch}"
 PUSH=true
 for arg in "$@"; do
   [ "$arg" = "--no-push" ] && PUSH=false
-  [ "$arg" = "--push" ] && PUSH=true
 done
 case "$BUMP" in --push|--no-push) BUMP="patch";; esac
 
@@ -40,7 +39,6 @@ echo "==> Bump version: $OLD_VERSION -> ($BUMP)"
 npm version "$BUMP" --no-git-tag-version > /dev/null
 NEW_VERSION=$(node -p "require('./package.json').version")
 
-# npm version với version cụ thể mà <= hiện tại sẽ tự fail; kiểm tra lại cho chắc
 if [ "$NEW_VERSION" = "$OLD_VERSION" ]; then
   echo "::error::Version không đổi ($OLD_VERSION). Kiểm tra lại tham số bump."
   exit 1
@@ -59,19 +57,19 @@ echo "  synced skills/registry.json version -> $NEW_VERSION"
 echo "==> Kiểm tra version chưa tồn tại trên npm"
 bash scripts/check-version.sh
 
-FILES_TO_COMMIT="package.json skills/registry.json"
-[ -f package-lock.json ] && FILES_TO_COMMIT="$FILES_TO_COMMIT package-lock.json"
-# shellcheck disable=SC2086
-git add $FILES_TO_COMMIT
+echo "==> Publish $NEW_VERSION lên npm (dùng npm auth local)"
+npm publish --provenance --access public
+
+git add package.json skills/registry.json
+[ -f package-lock.json ] && git add package-lock.json
 git commit -m "chore(release): v$NEW_VERSION" > /dev/null
 git tag "v$NEW_VERSION"
 echo "  committed + tagged v$NEW_VERSION"
 
 if [ "$PUSH" = true ]; then
   git push --follow-tags
-  echo "Đã push v$NEW_VERSION. Workflow 'Publish to npm' sẽ publish lên npm."
-  echo "Theo dõi tại: $(git remote get-url origin | sed 's/git@github.com:/https:\/\/github.com\//;s/\.git$//')/actions"
+  echo "Xong: đã publish $NEW_VERSION và push tag."
 else
-  echo "Xong local (chưa push). Khi sẵn sàng:"
+  echo "Publish xong local (chưa push). Khi sẵn sàng:"
   echo "  git push --follow-tags"
 fi

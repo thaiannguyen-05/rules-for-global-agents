@@ -53,8 +53,8 @@ scripts/
 ├── check-version.sh # kiểm tra version chưa tồn tại trên npm
 └── release.sh       # bump version an toàn (xem dưới)
 .github/workflows/
-├── ci.yml           # validate + version-guard trên mỗi push/PR
-└── publish.yml      # publish lên npm khi push tag v*.*.* hoặc tạo Release
+├── ci.yml           # validate trên mỗi push/PR
+└── publish.yml      # nút Run workflow: tự bump version + publish lên npm
 ```
 
 ## Đóng góp
@@ -62,23 +62,23 @@ scripts/
 1. Sửa/thêm skill trong `skills/`, mỗi skill phải có `SKILL.md` với frontmatter `name:` + `description:`.
 2. Khai báo skill mới vào `skills/registry.json`.
 3. Chạy `npm run validate` trước khi push.
-4. **Bắt buộc bump version** nếu PR đụng tới `skills/` (CI `version-guard` sẽ fail nếu quên) — dùng `bash scripts/release.sh patch|minor|major`.
+4. **Không sửa version bằng tay** — version do workflow publish tự tăng (xem dưới).
 
 ## Release lên npm
 
-> npm **từ chối publish đè version cũ** — mọi lần release đều phải bump version trước.
+> npm **từ chối publish đè version cũ** — version được **tự tăng mỗi lần publish**, không ai cần sửa `package.json`.
+
+**Cách chính — bấm nút (khuyên dùng):**
+
+1. Vào tab **Actions** → workflow **Publish to npm** → **Run workflow**
+2. Chọn loại tăng version: `patch` (fix skill, sửa doc) / `minor` (thêm skill) / `major` (breaking)
+3. Workflow tự: validate → bump version → sync `skills/registry.json` → kiểm tra version chưa có trên npm → publish → push commit + tag `vX.Y.Z` về main
+
+**Cách phụ — chạy local** (yêu cầu đã `npm login`):
 
 ```bash
-bash scripts/release.sh patch   # fix skill, sửa doc      (1.0.0 -> 1.0.1)
-bash scripts/release.sh minor   # thêm skill mới          (1.0.0 -> 1.1.0)
-bash scripts/release.sh major   # đổi cấu trúc, breaking  (1.0.0 -> 2.0.0)
-bash scripts/release.sh 1.2.3   # version cụ thể
+bash scripts/release.sh patch   # hoặc: minor | major | 1.2.3
 ```
-
-Script tự: validate skills → bump `package.json` + sync `skills/registry.json`
-→ kiểm tra version chưa có trên npm → commit + tag `vX.Y.Z` → `push --follow-tags`.
-Workflow "Publish to npm" chạy khi push tag `v*.*.*` hoặc khi tạo GitHub Release,
-kiểm tra lại (tag khớp `package.json`, version chưa tồn tại, pack dry-run) rồi publish.
 
 Kiểm tra: https://www.npmjs.com/package/opencode-andev-rules
 
