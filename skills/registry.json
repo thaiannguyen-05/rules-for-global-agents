@@ -17,7 +17,7 @@
       "version": "1.0.0",
       "tags": ["nestjs", "backend", "typescript"],
       "path": "skills/backend/nestJS",
-      "files": ["SKILL.md", "references/nestjs-module.md"]
+      "files": ["SKILL.md", "references/nestjs-module.md", "references/nestjs-testing.md"]
     },
     {
       "name": "prisma",

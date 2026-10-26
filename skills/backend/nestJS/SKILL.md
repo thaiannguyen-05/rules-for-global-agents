@@ -252,3 +252,4 @@ export async function correlationIdPlugin(app: FastifyInstance) {
 ## References
 
 - Feature slice layout, types, guards, dto, service, controller rules: `references/nestjs-module.md`.
+- Unit, integration, E2E testing strategies, TestContainers, mocking: `references/nestjs-testing.md`.
