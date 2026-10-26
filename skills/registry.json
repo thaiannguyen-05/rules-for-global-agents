@@ -1,31 +1,57 @@
 {
   "name": "andev-skills",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "AI agent skills by thaiannguyen-05",
   "skills": [
     {
       "name": "improve-codenase-systems",
       "description": "Scan codebase for architecture issues and deepening opportunities",
       "version": "1.0.0",
-      "tags": ["architecture", "review", "nestjs", "react", "codebase"],
+      "tags": [
+        "architecture",
+        "review",
+        "nestjs",
+        "react",
+        "codebase"
+      ],
       "path": "skills/enhance/improve-codenase-systems",
-      "files": ["SKILL.md", "HTML-REPORT.md", "agents/openai.yaml"]
+      "files": [
+        "SKILL.md",
+        "HTML-REPORT.md",
+        "agents/openai.yaml"
+      ]
     },
     {
       "name": "nestjs",
       "description": "NestJS backend rules — Fastify platform, module structure, zod validation",
       "version": "1.0.0",
-      "tags": ["nestjs", "backend", "typescript"],
+      "tags": [
+        "nestjs",
+        "backend",
+        "typescript"
+      ],
       "path": "skills/backend/nestJS",
-      "files": ["SKILL.md", "references/nestjs-module.md", "references/nestjs-testing.md"]
+      "files": [
+        "SKILL.md",
+        "references/nestjs-module.md",
+        "references/nestjs-testing.md"
+      ]
     },
     {
       "name": "prisma",
       "description": "Prisma ORM rules — client setup, queries, errors, transactions, migrations",
       "version": "1.0.0",
-      "tags": ["prisma", "database", "orm"],
+      "tags": [
+        "prisma",
+        "database",
+        "orm"
+      ],
       "path": "skills/infrastructure/prisma",
-      "files": ["SKILL.md", "references/prisma-queries.md", "references/prisma-schema.md"]
+      "files": [
+        "SKILL.md",
+        "references/prisma-queries.md",
+        "references/prisma-schema.md"
+      ]
     }
   ]
 }
