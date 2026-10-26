@@ -1,27 +1,6 @@
 # @thaiannguyen-05/opencode-rules
 
-Global coding rules for TypeScript & NestJS. Plugin for opencode.
-
-## Cài Plugin
-
-```bash
-opencode plugin @thaiannguyen-05/opencode-rules
-```
-
-hoặc:
-
-```bash
-cd ~/.config/opencode
-npm install @thaiannguyen-05/opencode-rules
-```
-
-Thêm vào `opencode.json`:
-
-```json
-{
-  "plugins": ["@thaiannguyen-05/opencode-rules"]
-}
-```
+Global coding rules for TypeScript & NestJS + AI agent skills.
 
 ## Cài Skill
 
@@ -39,7 +18,7 @@ cp -r skills/improve-codenase-systems ~/.agents/skills/
 
 ### Rules
 
-Nói "follow the rule of andev" trong prompt.
+Xem `skills/backend/nestJS/RULES.md` — covers TypeScript, NestJS, validation, error handling, database, security, API design, testing, and code style.
 
 ### Skill
 
@@ -47,7 +26,7 @@ Nói "scan codebase" hoặc "improve codebase" trong prompt.
 
 ## Rules
 
-Xem `RULES.md` — covers TypeScript, NestJS, validation, error handling, database, security, API design, testing, and code style.
+Xem `skills/backend/nestJS/RULES.md` — covers TypeScript, NestJS, validation, error handling, database, security, API design, testing, and code style.
 
 ## Skills
 
