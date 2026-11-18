@@ -38,6 +38,25 @@
       ]
     },
     {
+      "name": "payment",
+      "description": "Payment & order lifecycle — Order state machine, Sepay checkout, IPN webhook, locking & idempotency",
+      "version": "1.0.0",
+      "tags": [
+        "payment",
+        "sepay",
+        "order",
+        "backend",
+        "nestjs"
+      ],
+      "path": "skills/backend/payment",
+      "files": [
+        "SKILL.md",
+        "references/payment-gateway-interface.md",
+        "references/order-lifecycle.md",
+        "references/sepay-adapter.md"
+      ]
+    },
+    {
       "name": "prisma",
       "description": "Prisma ORM rules — client setup, queries, errors, transactions, migrations",
       "version": "1.0.0",
@@ -51,6 +70,23 @@
         "SKILL.md",
         "references/prisma-queries.md",
         "references/prisma-schema.md"
+      ]
+    },
+    {
+      "name": "postgresql-replicate",
+      "description": "PostgreSQL leader-follower streaming replication — docker infra + NestJS/Prisma read replica",
+      "version": "1.0.0",
+      "tags": [
+        "postgresql",
+        "replication",
+        "database",
+        "docker"
+      ],
+      "path": "skills/db/postgresql/replicate",
+      "files": [
+        "SKILL.md",
+        "references/infra.md",
+        "references/app-integration.md"
       ]
     }
   ]

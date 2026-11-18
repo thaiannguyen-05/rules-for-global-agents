@@ -28,7 +28,9 @@ cp -r skills/infrastructure/prisma ~/.agents/skills/
 |-------|-----------|----------|
 | `improve-codenase-systems` | `skills/enhance/improve-codenase-systems/` | Muốn scan codebase tìm vấn đề kiến trúc — nói "scan codebase" hoặc "improve codebase" trong prompt |
 | `nestjs` | `skills/backend/nestJS/` | Viết/review code NestJS — module structure, Fastify, zod validation, DI |
+| `payment` | `skills/backend/payment/` | Payment & order lifecycle — Order state machine, Sepay checkout, IPN webhook, locking |
 | `prisma` | `skills/infrastructure/prisma/` | Viết/review Prisma — client singleton, queries, transactions, migrations |
+| `postgresql-replicate` | `skills/db/postgresql/replicate/` | Postgres leader-follower replication — docker infra + read replica integration |
 
 Chi tiết từng skill xem file `SKILL.md` trong thư mục tương ứng. Danh mục đầy đủ: `skills/registry.json`.
 
